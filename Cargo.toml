@@ -1,0 +1,34 @@
+[package]
+name = "middleware-db"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+log = "0.4.*"
+tokio = { version = "1.*", features = ["full", "rt-multi-thread"] }
+tokio-util = "0.7.*"
+async-trait = "0.1.*"
+actix-web = { version = "4.*", features = ["openssl"] }
+serde = { version = "1.0.*", features = ["derive"] }
+serde_json = "1.*"
+futures = "0.3.*"
+log4rs = "1.2.*"
+anyhow = "1.0.*"
+thiserror = "1.0.*"
+regex = "1.7.*"
+config = "0.13.*"
+configparser = "3.0.*"
+lazy_static = "1.4.*"
+chrono = { version = "0.4.*", features = ["serde"] }
+crossbeam = "0.8.*"
+openssl = "0.10.*"
+tiberius = { version = "0.12.*", features = [
+  "tds73",
+  "sql-browser-tokio",
+  "chrono",
+] }
+mysql = "24.*"
+postgres = "0.19.*"
+tokio-postgres = "0.7.*"
