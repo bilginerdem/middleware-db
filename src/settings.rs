@@ -61,3 +61,4 @@ pub fn get_array(key: &str) -> Vec<String> {
     value.split(',').map(|f| f.to_string()).collect::<Vec<String>>()
   }
 }
+ 

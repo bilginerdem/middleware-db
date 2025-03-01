@@ -1,7 +1,7 @@
 use std::io::{Error, ErrorKind};
-
-use super::db::Db; 
+ 
 use async_trait::async_trait;
+use deadpool_tiberius::Pool;
 use tiberius::{Client, Config, Query, SqlBrowser};
 use tokio::net::TcpStream;
 use tokio_util::compat::{Compat, TokioAsyncWriteCompatExt};
@@ -12,31 +12,28 @@ use crate::{
 };
 pub struct MsSql {}
 
-#[async_trait]
-impl Db for MsSql {
-  async fn execute(req: CommandRequest) -> Result<CommandResponse, std::io::Error> {
-    match get_connection().await {
-      Ok(mut client) => {
-        let mut query = Query::new(req.query);
+async fn execute(req: CommandRequest) -> Result<CommandResponse, std::io::Error> {
+  match get_connection().await {
+    Ok(mut client) => {
+      let mut query = Query::new(req.query);
 
-        for p in req.parameters {
-          query.bind(p.value);
-        }
+      for p in req.parameters {
+        query.bind(p.value);
+      }
 
-        let result = query.execute(&mut client).await;
-        match result {
-          Ok(r) => {
-            let mut res = CommandResponse::default();
-            res.row_affected = r.rows_affected().to_vec();
-            Ok(res)
-          }
-          Err(e) => Err(Error::new(ErrorKind::InvalidData, e.to_string())),
+      let result = query.execute(&mut client).await;
+      match result {
+        Ok(r) => {
+          let mut res = CommandResponse::default();
+          res.row_affected = r.rows_affected().to_vec();
+          Ok(res)
         }
+        Err(e) => Err(Error::new(ErrorKind::InvalidData, e.to_string())),
       }
-      Err(e) => {
-        log::error!("MsSql connection error: {}", e);
-        Err(std::io::Error::new(std::io::ErrorKind::Other, "MsSql connection"))
-      }
+    }
+    Err(e) => {
+      log::error!("MsSql connection error: {}", e);
+      Err(std::io::Error::new(std::io::ErrorKind::Other, "MsSql connection"))
     }
   }
 }
@@ -52,11 +49,13 @@ async fn get_connection() -> Result<Client<Compat<TcpStream>>, Box<SyncError>> {
         Err(e) => Err(Box::new(std::io::Error::new(std::io::ErrorKind::ConnectionRefused, e))),
       },
       Err(e) => Err(Box::new(std::io::Error::new(std::io::ErrorKind::AddrNotAvailable, e))),
-    }
+    } 
   } else {
     Err(Box::new(std::io::Error::new(
       std::io::ErrorKind::NotFound,
       "odbc.connection config error",
     )))
   }
-}
+} 
+
+ 
